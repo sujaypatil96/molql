@@ -96,6 +96,9 @@ const generator = {
         'in-complement': Argument(Type.Bool, { isOptional: true, defaultValue: false })
     }), Types.AtomSelectionQuery, 'Executes query only on atoms that are in the source selection.'),
 
+    // nthRes generator
+    nthRes: symbol(Arguments.List(Type.Num), Types.AtomSelectionQuery, 'Returns residue specified by a selection of atoms.'),
+
     empty: symbol(Arguments.None, Types.AtomSelectionQuery, 'Nada.'),
 }
 
