@@ -162,4 +162,9 @@ export function rings(env: Environment, fingerprints: Expression<string>[]) {
     return ret.getSelection();
 }
 
+// implementation for the nthRes function
+export function nthRes(env: Environment, { entityTest, chainTest, residueTest, atomTest }: GeneratorParams, groupCtx: GroupCtx) {
+    
+}
+
 export function empty(env: Environment) { return AtomSelection.empty }
