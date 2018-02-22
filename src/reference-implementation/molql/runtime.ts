@@ -220,6 +220,7 @@ export const SymbolRuntime: Symbol.Info[] = [
         (env) => StructureRuntime.Generators.atomGroupsGenerator(env, { entityTest: v['entity-test'], chainTest: v['chain-test'], residueTest: v['residue-test'], atomTest: v['atom-test'], groupBy: v['group-by'] })),
     Symbol(MolQL.structure.generator.queryInSelection)((env, v) => env => StructureRuntime.Generators.querySelection(env, v[0](env), v.query(env), v['in-complement'])),
     Symbol(MolQL.structure.generator.rings)((env, v) => env => StructureRuntime.Generators.rings(env, v as any)),
+    // Symbol(MolQL.structure.generator.nthRes)((env, v) => env => StructureRuntime.Generators.nthRes(env, v as any)),
     Symbol(MolQL.structure.generator.empty)((env, v) => env => StructureRuntime.Generators.empty(env)),
 
     // ============= MODIFIERS ================
