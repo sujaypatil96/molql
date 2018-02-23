@@ -14,6 +14,8 @@ import Context from '../context'
 import { Model } from '../../../structure/data'
 import Mask from '../../../utils/mask'
 
+import Type from '../../../../molql/type'
+
 type Pred = Expression<boolean>
 
 export type GeneratorParams = {
@@ -30,6 +32,38 @@ type GroupCtx = {
     groups: FastMap<number, number[]>,
     selection: number[][]
 }
+
+export type nthresParams = {
+    identifyRes: Pred,
+    groupBy: Expression<any>
+}
+
+// nthRes implementation (?)
+export function nthRes(number: Type.Any, env: Environment, { identifyRes }: nthresParams, groupCtx: GroupCtx) {
+    const ctx = env.context;
+    const { model } = ctx;
+    const { chainOffset, count: entityCount } = model.entities;
+    const { residueOffset } = model.chains;
+    const { atomOffset } = model.residues;
+
+    Environment.lockSlot(env, 'element');
+
+    let resCount = 0;   // stores the count of the total no. of residues
+
+    for (let eI = 0; eI < entityCount; eI++) {
+        for (let cI = chainOffset[eI], _cI = chainOffset[eI + 1]; cI < _cI; cI++) {
+            for (let rI = residueOffset[cI], _rI = residueOffset[cI + 1]; rI < _rI; rI++) {
+                resCount++;
+                for (let aI = atomOffset[rI], _aI = atomOffset[rI + 1]; aI < _aI; aI++) {
+                    // find the group of atoms that make up the residue
+                    // group these "selected" atoms
+                    // highlight this selection
+                }
+            }
+        }
+    }
+
+}   // end of the nthRes implementation
 
 function atomGroupsIterator(env: Environment, { entityTest, chainTest, residueTest, atomTest }: GeneratorParams, groupCtx: GroupCtx) {
     const ctx = env.context;
@@ -160,11 +194,6 @@ export function rings(env: Environment, fingerprints: Expression<string>[]) {
         }
     }
     return ret.getSelection();
-}
-
-// implementation for the nthRes function
-export function nthRes(env: Environment, { entityTest, chainTest, residueTest, atomTest }: GeneratorParams, groupCtx: GroupCtx) {
-    
 }
 
 export function empty(env: Environment) { return AtomSelection.empty }
