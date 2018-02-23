@@ -96,8 +96,12 @@ const generator = {
         'in-complement': Argument(Type.Bool, { isOptional: true, defaultValue: false })
     }), Types.AtomSelectionQuery, 'Executes query only on atoms that are in the source selection.'),
 
-    // nthRes generator
-    nthRes: symbol(Arguments.List(Type.Num), Types.AtomSelectionQuery, 'Returns residue specified by a selection of atoms.'),
+    // nthRes symbol
+    nthRes: symbol(Arguments.Dictionary({
+        0: Argument(Type.Num, { description: 'This argument will grab the residue number.' }),
+        'identify-res': Argument(Type.Bool, { isOptional: true, defaultValue: true, description: 'Identify all the atoms of a given residue.' }),
+        'group-by': Argument(Type.Any, { isOptional: true, defaultValue: `atom-key`, description: 'Group atoms to sets based on this property. Default: each atom has its own set' }),
+    }), Types.AtomSelectionQuery, 'Returns all atoms that are part of the specified residue.'),
 
     empty: symbol(Arguments.None, Types.AtomSelectionQuery, 'Nada.'),
 }
