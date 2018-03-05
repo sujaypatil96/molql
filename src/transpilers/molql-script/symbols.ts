@@ -125,6 +125,12 @@ export const SymbolTable = [
                 'chain-test': M.tryGetArg(args, 0, true),
                 'group-by': B.ammp('chainKey')
             })),
+
+            // macro for nth-res
+            Macro(Symbol('sel.atom.nth-res', Arguments.Dictionary({
+                0: Argument(Type.Num, { isOptional: true, defaultValue: 5, description: 'Highlights the nth residue.' }),
+            }), Struct.Types.AtomSelection, 'A selection of atom sets grouped by residue (residue provided by user).'),
+            args => B.struct.generator.nthRes())
         ],
         [
             'Modifiers',
