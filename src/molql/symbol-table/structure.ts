@@ -96,14 +96,11 @@ const generator = {
         'in-complement': Argument(Type.Bool, { isOptional: true, defaultValue: false })
     }), Types.AtomSelectionQuery, 'Executes query only on atoms that are in the source selection.'),
 
-    // nthRes symbol
-    nthRes: symbol(Arguments.Dictionary({
-        0: Argument(Type.Num, { description: 'This argument will grab the residue number.' }),
-        'identify-res': Argument(Type.Bool, { isOptional: true, defaultValue: true, description: 'Identify all the atoms of a given residue.' }),
-        'group-by': Argument(Type.Any, { isOptional: true, defaultValue: `atom-key`, description: 'Group atoms to sets based on this property. Default: each atom has its own set' }),
-    }), Types.AtomSelectionQuery, 'Returns all atoms that are part of the specified residue.'),
-
     empty: symbol(Arguments.None, Types.AtomSelectionQuery, 'Nada.'),
+
+    // nthRes generator
+    // right now, the value of 'n' is hardcoded in the implementation - not dynamic w.r.t label_seq_id
+    nthRes: symbol(Arguments.None, Types.AtomSelectionQuery, 'Returns and highlights the 5th residue.'),
 }
 
 const modifier = {
