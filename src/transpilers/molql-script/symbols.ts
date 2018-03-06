@@ -105,6 +105,9 @@ export const SymbolTable = [
             Alias(MolQL.structure.generator.rings, 'sel.atom.rings'),
             Alias(MolQL.structure.generator.empty, 'sel.atom.empty'),
 
+            // alias for the "sel.atom.nth-res n"
+            Alias(MolQL.structure.generator.nthRes, 'sel.atom.nth-res'),
+
             Macro(Symbol('sel.atom.atoms', Arguments.Dictionary({
                 0: Argument(Type.Bool, { isOptional: true, defaultValue: true, description: 'Test applied to each atom.' })
             }), Struct.Types.AtomSelection, 'A selection of singleton atom sets.'),
@@ -124,13 +127,13 @@ export const SymbolTable = [
             args => B.struct.generator.atomGroups({
                 'chain-test': M.tryGetArg(args, 0, true),
                 'group-by': B.ammp('chainKey')
-            })),
+            }))
 
             // macro for nth-res
-            Macro(Symbol('sel.atom.nth-res', Arguments.Dictionary({
-                0: Argument(Type.Num, { isOptional: true, defaultValue: 5, description: 'Highlights the nth residue.' }),
-            }), Struct.Types.AtomSelection, 'A selection of atom sets grouped by residue (residue provided by user).'),
-            args => B.struct.generator.nthRes())
+            // Macro(Symbol('sel.atom.nth-res', Arguments.Dictionary({
+            //     0: Argument(Type.Num, { isOptional: true, defaultValue: 5, description: 'Highlights the nth residue.' }),
+            // }), Struct.Types.AtomSelection, 'A selection of atom sets grouped by residue (residue provided by user).'),
+            // args => B.struct.generator.nthRes())
         ],
         [
             'Modifiers',
