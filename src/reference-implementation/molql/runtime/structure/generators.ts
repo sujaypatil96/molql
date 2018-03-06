@@ -13,6 +13,7 @@ import ElementAddress from '../../data/element-address'
 import Context from '../context'
 import { Model } from '../../../structure/data'
 import Mask from '../../../utils/mask'
+// import Type from '../../../../molql/type'
 
 type Pred = Expression<boolean>
 
@@ -163,7 +164,7 @@ export function rings(env: Environment, fingerprints: Expression<string>[]) {
 }
 
 // implementation for nthRes to iterate and reference the atoms
-export function nthResIterator(env: Environment, groupCtx: GroupCtx) {
+export function nthResIterator(env: Environment, groupCtx: GroupCtx, res:number) {
 
     const ctx = env.context;
     const { model } = ctx;
@@ -171,10 +172,15 @@ export function nthResIterator(env: Environment, groupCtx: GroupCtx) {
     const { residueOffset } = model.chains;
     const { atomOffset } = model.residues;
 
-    Environment.lockSlot(env, 'element');
+    // get the dataIndex
+    const { dataIndex } = model.atoms;
+
+    // get the "sequence number"
+    const { label_seq_id } = model.data.atom_site;
+
     const element = env.slots.element;
 
-    var totRes: number = 0; // total residues
+    var seq_id: number = 0;
 
     for (let eI = 0; eI < entityCount; eI++) {
         ElementAddress.setEntityLayer(model, element, eI);
@@ -184,35 +190,35 @@ export function nthResIterator(env: Environment, groupCtx: GroupCtx) {
 
             for (let rI = residueOffset[cI], _rI = residueOffset[cI + 1]; rI < _rI; rI++) {
                 ElementAddress.setResidueLayer(model, element, rI);
-                totRes++;
 
+                // iterate through label_seq_id and fetch the seq_id
                 for (let aI = atomOffset[rI], _aI = atomOffset[rI + 1]; aI < _aI; aI++) {
                     ElementAddress.setAtomLayer(model, element, aI);
+
+                    // get the seq_id based from the "row" in the atom site, you need the appropriate "dataIndex"
+                    seq_id = label_seq_id.getInteger(dataIndex[atomOffset[rI]]);
                 }
 
-                if (rI == 5) {
-                    var atomCountOnRes: number = 0; // no. of atoms on residue no. 5
+                if (seq_id == res) {
+                    var atomCountOnRes: number = 0; // no. of atoms on residue no. res
                     for (let aI = atomOffset[rI], _aI = atomOffset[rI + 1]; aI < _aI; aI++) {
                         ElementAddress.setAtomLayer(model, element, aI);
 
                         groupAtom(groupCtx, aI);
                         atomCountOnRes++;
                     }
-                    console.log("Atom count on residue 5: " + atomCountOnRes);
+                    console.log("Atom count on residue seq_id: " + atomCountOnRes);
                 }
             }
         }
     }
-    console.log("Total no. of residues: " + totRes);
-    Environment.unlockSlot(env, 'element');
 }
 
 // generator to return the specified atom selection selection
-export function nthResGenerator(env: Environment, params: Partial<GeneratorParams>): AtomSelection {
+export function nthResGenerator(env: Environment, res: number, params: Partial<GeneratorParams>): AtomSelection {
     const { groupBy = groupByAtom } = params;
-
     const groupCtx: GroupCtx = { env, groupBy, groups: FastMap.create(), selection: [] };
-    nthResIterator(env, groupCtx);
+    nthResIterator(env, groupCtx, res);
     const result = AtomSelection.linearBuilder();
     for (const set of groupCtx.selection) {
         result.add(AtomSet(set));
