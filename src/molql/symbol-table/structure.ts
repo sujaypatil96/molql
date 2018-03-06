@@ -100,7 +100,8 @@ const generator = {
 
     // nthRes generator
     // right now, the value of 'n' is hardcoded in the implementation - not dynamic w.r.t label_seq_id
-    nthRes: symbol(Arguments.None, Types.AtomSelectionQuery, 'Returns and highlights the 5th residue.'),
+    // now it can take in the value of "n" as the first argument
+    nthRes: symbol(Arguments.Dictionary({ 0: Argument(Type.Num) }), Types.AtomSelectionQuery, 'Returns and highlights the residue specified by the 1st argument.'),
 }
 
 const modifier = {
