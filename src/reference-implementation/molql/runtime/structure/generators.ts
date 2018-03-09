@@ -175,11 +175,11 @@ export function nthResIterator(env: Environment, groupCtx: GroupCtx, res:number)
     // get the dataIndex
     const { dataIndex } = model.atoms;
 
-    // get the "sequence number"
     const { label_seq_id } = model.data.atom_site;
 
     const element = env.slots.element;
 
+    // collect the "sequence number" in this variable
     var seq_id: number = 0;
 
     for (let eI = 0; eI < entityCount; eI++) {
@@ -207,7 +207,7 @@ export function nthResIterator(env: Environment, groupCtx: GroupCtx, res:number)
                         groupAtom(groupCtx, aI);
                         atomCountOnRes++;
                     }
-                    console.log("Atom count on residue seq_id: " + atomCountOnRes);
+                    console.log("Atom count on residue " + seq_id + ": " + atomCountOnRes);
                 }
             }
         }
@@ -216,10 +216,12 @@ export function nthResIterator(env: Environment, groupCtx: GroupCtx, res:number)
 
 // generator to return the specified atom selection selection
 export function nthResGenerator(env: Environment, res: number, params: Partial<GeneratorParams>): AtomSelection {
+
     const { groupBy = groupByAtom } = params;
     const groupCtx: GroupCtx = { env, groupBy, groups: FastMap.create(), selection: [] };
     nthResIterator(env, groupCtx, res);
     const result = AtomSelection.linearBuilder();
+
     for (const set of groupCtx.selection) {
         result.add(AtomSet(set));
     }
