@@ -163,68 +163,38 @@ export function rings(env: Environment, fingerprints: Expression<string>[]) {
     return ret.getSelection();
 }
 
-// implementation for nthRes to iterate and reference the atoms
-export function nthResIterator(env: Environment, groupCtx: GroupCtx, res:number) {
+// testing atom selection builder vs groupAtom function
+export function nthResGenerator(env: Environment, res: number, params: Partial<GeneratorParams>): AtomSelection {
 
-    const ctx = env.context;
-    const { model } = ctx;
-    const { chainOffset, count: entityCount } = model.entities;
-    const { residueOffset } = model.chains;
-    const { atomOffset } = model.residues;
+    const ctx = env.context;    // get context of molecule
+    const { model } = ctx;  // model part of context in 'model'
+    const { atomOffset } = model.residues;  // get the atomOffset array
+    const { dataIndex } = model.atoms;    // get the dataIndex
+    const { label_seq_id } = model.data.atom_site;  // get the 'sequence number'
 
-    // get the dataIndex
-    const { dataIndex } = model.atoms;
+    const { groupBy = groupByAtom } = params;
+    const groupCtx: GroupCtx = {env, groupBy, groups: FastMap.create(), selection: [] };
 
-    const { label_seq_id } = model.data.atom_site;
+    for (let rI = 0, _rI = model.residues.count; rI < _rI; rI++) {
+        // iterate through label_seq_id and fetch the seq_id
+        for (let aI = atomOffset[rI], _aI = atomOffset[rI + 1]; aI < _aI; aI++) {
+            const seq_id = label_seq_id.getInteger(dataIndex[atomOffset[rI]]);    // get the seq_id based from the "row" in the atom site, you need the appropriate "dataIndex"
 
-    const element = env.slots.element;
-
-    // collect the "sequence number" in this variable
-    var seq_id: number = 0;
-
-    for (let eI = 0; eI < entityCount; eI++) {
-        ElementAddress.setEntityLayer(model, element, eI);
-
-        for (let cI = chainOffset[eI], _cI = chainOffset[eI + 1]; cI < _cI; cI++) {
-            ElementAddress.setChainLayer(model, element, cI);
-
-            for (let rI = residueOffset[cI], _rI = residueOffset[cI + 1]; rI < _rI; rI++) {
-                ElementAddress.setResidueLayer(model, element, rI);
-
-                // iterate through label_seq_id and fetch the seq_id
+            if (seq_id == res) {
                 for (let aI = atomOffset[rI], _aI = atomOffset[rI + 1]; aI < _aI; aI++) {
-                    ElementAddress.setAtomLayer(model, element, aI);
-
-                    // get the seq_id based from the "row" in the atom site, you need the appropriate "dataIndex"
-                    seq_id = label_seq_id.getInteger(dataIndex[atomOffset[rI]]);
+                    groupAtom(groupCtx, aI);
                 }
-
-                if (seq_id == res) {
-                    var atomCountOnRes: number = 0; // no. of atoms on residue no. res
-                    for (let aI = atomOffset[rI], _aI = atomOffset[rI + 1]; aI < _aI; aI++) {
-                        ElementAddress.setAtomLayer(model, element, aI);
-
-                        groupAtom(groupCtx, aI);
-                        atomCountOnRes++;
-                    }
-                    console.log("Atom count on residue " + seq_id + ": " + atomCountOnRes);
-                }
+                break;
             }
         }
     }
-}
 
-// generator to return the specified atom selection selection
-export function nthResGenerator(env: Environment, res: number, params: Partial<GeneratorParams>): AtomSelection {
-
-    const { groupBy = groupByAtom } = params;
-    const groupCtx: GroupCtx = { env, groupBy, groups: FastMap.create(), selection: [] };
-    nthResIterator(env, groupCtx, res);
     const result = AtomSelection.linearBuilder();
 
     for (const set of groupCtx.selection) {
         result.add(AtomSet(set));
     }
+
     return result.getSelection();
 }
 
