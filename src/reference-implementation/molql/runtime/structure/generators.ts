@@ -163,7 +163,7 @@ export function rings(env: Environment, fingerprints: Expression<string>[]) {
     return ret.getSelection();
 }
 
-// testing atom selection builder vs groupAtom function
+
 export function nthResGenerator(env: Environment, res: number, params: Partial<GeneratorParams>): AtomSelection {
 
     const ctx = env.context;    // get context of molecule
