@@ -163,7 +163,7 @@ export function rings(env: Environment, fingerprints: Expression<string>[]) {
     return ret.getSelection();
 }
 
-export function nthResGenerator(env: Environment, res: number, params: Partial<GeneratorParams>): AtomSelection {
+export function nthResGenerator(env: Environment, res: number): AtomSelection {
 
     const ctx = env.context;    // get context of molecule
     const { model } = ctx;  // model part of context in 'model'
@@ -178,7 +178,7 @@ export function nthResGenerator(env: Environment, res: number, params: Partial<G
 
         // iterate through label_seq_id and fetch the seq_id
         const seq_id = label_seq_id.getInteger(dataIndex[atomOffset[rI]]);    // get the seq_id based from the "row" in the atom site, you need the appropriate "dataIndex"
-            if (seq_id == res) {
+            if (seq_id === res) {
                 for (let aI = atomOffset[rI], _aI = atomOffset[rI + 1]; aI < _aI; aI++) {
                     resArr[resArr.length] = aI;
                 }
