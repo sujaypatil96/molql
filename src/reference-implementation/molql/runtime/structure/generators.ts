@@ -163,7 +163,7 @@ export function rings(env: Environment, fingerprints: Expression<string>[]) {
     return ret.getSelection();
 }
 
-
+// testing atom selection builder vs groupAtom function
 export function nthResGenerator(env: Environment, res: number, params: Partial<GeneratorParams>): AtomSelection {
 
     const ctx = env.context;    // get context of molecule
@@ -172,27 +172,20 @@ export function nthResGenerator(env: Environment, res: number, params: Partial<G
     const { dataIndex } = model.atoms;    // get the dataIndex
     const { label_seq_id } = model.data.atom_site;  // get the 'sequence number'
 
-    const { groupBy = groupByAtom } = params;
-    const groupCtx: GroupCtx = {env, groupBy, groups: FastMap.create(), selection: [] };
-
-    for (let rI = 0, _rI = model.residues.count; rI < _rI; rI++) {
-        // iterate through label_seq_id and fetch the seq_id
-        for (let aI = atomOffset[rI], _aI = atomOffset[rI + 1]; aI < _aI; aI++) {
-            const seq_id = label_seq_id.getInteger(dataIndex[atomOffset[rI]]);    // get the seq_id based from the "row" in the atom site, you need the appropriate "dataIndex"
-
-            if (seq_id == res) {
-                for (let aI = atomOffset[rI], _aI = atomOffset[rI + 1]; aI < _aI; aI++) {
-                    groupAtom(groupCtx, aI);
-                }
-                break;
-            }
-        }
-    }
-
     const result = AtomSelection.linearBuilder();
 
-    for (const set of groupCtx.selection) {
-        result.add(AtomSet(set));
+    const resArr: number[] = [];   // array to store the residue
+    for (let rI = 0, _rI = model.residues.count; rI < _rI; rI++) {
+
+        // iterate through label_seq_id and fetch the seq_id
+        const seq_id = label_seq_id.getInteger(dataIndex[atomOffset[rI]]);    // get the seq_id based from the "row" in the atom site, you need the appropriate "dataIndex"
+            if (seq_id == res) {
+                for (let aI = atomOffset[rI], _aI = atomOffset[rI + 1]; aI < _aI; aI++) {
+                    resArr[resArr.length] = aI;
+                }
+                result.add(AtomSet(resArr));
+                break;
+            }
     }
 
     return result.getSelection();
