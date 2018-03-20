@@ -54,7 +54,7 @@ const lang = P.createLanguage({
       r.Parens,
       r.Operator,
       r.Expression
-    ).wrap(P.string('('), P.string(')'))
+  ).wrap(P.string('('), P.string(')'))
   },
 
   Expression: function(r) {
@@ -166,8 +166,15 @@ const lang = P.createLanguage({
       r.Parens,
       r.Expression
     ).trim(P.optWhitespace)
+},
+
+  Command: function(r) {
+    return P.alt(
+        // other parsers
+    );
   }
 })
 
 const transpiler: Transpiler = str => lang.Query.tryParse(str)
+
 export default transpiler
