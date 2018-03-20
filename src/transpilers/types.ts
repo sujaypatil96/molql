@@ -32,8 +32,7 @@ export interface Command {
     '@examples': string
     isUnsupported?: boolean     // supported or not
     name: string    // name of the PyMol command. Ex: 'select'
-    regex: RegExp   // use this to define RegExp for each command. Ex. '\bselect\s{property}\s{Expression}'
-    map?: (x: Expression) => Expression     // type of argument for map would be 'Expression' and it will yield an 'Expression'
+    map?: (args: Expression[]) => Expression     // mapping to convert o/p of Parsimmon parse tree to MolQL expression tree
 }
 
 export type CommandDict = { [name: string]: Command }
