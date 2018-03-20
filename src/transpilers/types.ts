@@ -26,6 +26,18 @@ export interface Keyword {
 
 export type KeywordDict = { [name: string]: Keyword }
 
+// define the type for 'Command'
+export interface Command {
+    '@desc': string
+    '@examples': string
+    isUnsupported?: boolean     // supported or not
+    name: string    // name of the PyMol command. Ex: 'select'
+    regex: RegExp   // use this to define RegExp for each command. Ex. '\bselect\s{property}\s{Expression}'
+    map?: (x: Expression) => Expression     // type of argument for map would be 'Expression' and it will yield an 'Expression'
+}
+
+export type CommandDict = { [name: string]: Command }
+
 export interface Property {
   '@desc': string
   '@examples': string[]
