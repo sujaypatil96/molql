@@ -6,12 +6,17 @@ import B from '../../molql/builder'
 
 const commands: CommandDict = {
     select: {
-        // code
         // perhaps using atomGroups() or any other symbols
         '@desc' : 'selection of atoms depending on the selection-expression',
         '@examples' : ['select near142, resi 142 around 5'],
-        name: 'select',
-        map: () => B.struct.generator.atomGroups()
+        name : 'select',
+        map: () => B.struct.generator.atomGroups()  // random implementation for now
+    },
+    show: {
+      '@desc' : 'specify the representation for the current selection',
+      '@examples' : ['show ribbon'],
+      name : 'show',
+      map: () => B.struct.generator.nthRes()  // random implementation
     }
 }
 
