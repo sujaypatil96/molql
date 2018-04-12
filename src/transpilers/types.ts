@@ -26,13 +26,19 @@ export interface Keyword {
 
 export type KeywordDict = { [name: string]: Keyword }
 
-// define the type for 'Command'
 export interface Command {
     '@desc': string
-    '@examples': string
-    isUnsupported?: boolean     // supported or not
-    name: string    // name of the PyMol command. Ex: 'select'
-    map?: (args: Expression[]) => Expression     // mapping to convert o/p of Parsimmon parse tree to MolQL expression tree
+    isUnsupported?: boolean
+    isNumeric?: boolean
+    abbr?: string[]
+    regex: RegExp
+    // name: string
+    level: 'atom-test' | 'residue-test' | 'chain-test' | 'entity-test'
+    property?: any  // Symbol
+    map: (s: string) => any
+    // level?: 'atom-test' | 'residue-test' | 'chain-test' | 'entity-test'
+    // property?: any  // Symbol
+    // map?: (args: Expression[]) => Expression    // modified type signature for command transformation
 }
 
 export type CommandDict = { [name: string]: Command }
