@@ -12,8 +12,25 @@ namespace Builder {
     export const core = MolQL.core;
     export const struct = MolQL.structure;
 
+    // scene builder
+    // use it freely for mapping the PyMol symbols
+    export const scene = MolQL.scene;
+
     export function atomName(s: string) { return struct.type.atomName([s]); }
     export function es(s: string) { return struct.type.elementSymbol([s]); }
+
+    export function rand(s: string) {
+
+        var re = /name\s+[a-zA-Z]+/
+        if (s.match(re)) {
+            s = s.replace('name', '')
+            s = s.replace(/ +/, '')
+            return struct.type.atomName([s])
+        } else {
+            return struct.type.atomName([s])
+        }
+    }
+
     export function list(...xs: Expression[]) { return core.type.list(xs); }
     export function set(...xs: Expression[]) { return core.type.set(xs); }
     export function fn(x: Expression) { return core.ctrl.fn([x]); }
