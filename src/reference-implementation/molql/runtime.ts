@@ -10,6 +10,9 @@ import { isSymbol } from '../../molql/symbol'
 import { FastSet } from '../utils/collections'
 import { ElementSymbol, ResidueIdentifier } from '../structure/data'
 import StructureRuntime from './runtime/structure'
+
+// import for scene SymbolRuntime
+import SceneRuntime from './runtime/scene'
 import toUpperCase from '../utils/upper-case'
 
 const staticAttr: Symbol.Attributes = { isStatic: true }
@@ -225,6 +228,9 @@ export const SymbolRuntime: Symbol.Info[] = [
     Symbol(MolQL.structure.generator.queryInSelection)((env, v) => env => StructureRuntime.Generators.querySelection(env, v[0](env), v.query(env), v['in-complement'])),
     Symbol(MolQL.structure.generator.rings)((env, v) => env => StructureRuntime.Generators.rings(env, v as any)),
     Symbol(MolQL.structure.generator.empty)((env, v) => env => StructureRuntime.Generators.empty(env)),
+
+    // ============= COMMANDS ================
+    Symbol(MolQL.scene.command.select)((env, v) => (env) => SceneRuntime.Selection.sceneGenerator(env, { propSelector: v['property-selector'], entityTest: v['entity-test'], chainTest: v['chain-test'], residueTest: v['residue-test'], atomTest: v['atom-test'], groupBy: v['group-by'] })),
 
     // ============= MODIFIERS ================
     Symbol(MolQL.structure.modifier.queryEach)((env, v) => env => StructureRuntime.Modifiers.queryEach(env, v[0](env), v.query(env))),
