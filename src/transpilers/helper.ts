@@ -6,7 +6,7 @@
 
 import * as P from 'parsimmon'
 
-import { KeywordDict, PropertyDict, FunctionDict, OperatorList } from './types'
+import { KeywordDict, PropertyDict, FunctionDict, OperatorList, CommandDict } from './types'
 import B from '../molql/builder'
 import Expression from '../mini-lisp/expression'
 
@@ -168,6 +168,7 @@ export function orExpr (selections: any[]) {
 }
 
 export function testExpr (property: any, args: any) {
+
   if (args && args.op !== undefined && args.val !== undefined) {
     const opArgs = [ property, args.val ]
     switch (args.op) {
@@ -190,6 +191,11 @@ export function testExpr (property: any, args: any) {
   } else {
     return B.core.rel.eq([ property, args[0] ])
   }
+}
+
+// function for property selector
+export function propSelec (propselec: any, args: any) {
+    console.log(args)
 }
 
 export function invertExpr (selection: Expression) {
@@ -217,6 +223,7 @@ export function getPropertyRules(properties: PropertyDict) {
     const errorFn = makeError(`property '${name}' not supported`)
     const rule = P.regex(ps.regex).map(x => {
       if (ps.isUnsupported) errorFn()
+
       return testExpr(ps.property, ps.map(x))
     })
 
@@ -233,11 +240,15 @@ export function getNamedPropertyRules(properties: PropertyDict) {
 
   Object.keys(properties).sort(strLenSortFn).forEach( name => {
     const ps = properties[name]
+
     const errorFn = makeError(`property '${name}' not supported`)
+
     const rule = P.regex(ps.regex).map(x => {
       if (ps.isUnsupported) errorFn()
+
       return testExpr(ps.property, ps.map(x))
     })
+
     const nameRule = P.regex(getNamesRegex(name, ps.abbr)).trim(P.optWhitespace)
     const groupMap = (x: any) => B.struct.generator.atomGroups({[ps.level]: x})
 
@@ -257,6 +268,43 @@ export function getNamedPropertyRules(properties: PropertyDict) {
   })
 
   return namedPropertiesList
+}
+
+export function getCommandRules(commands: CommandDict) {
+  const namedCommandsList: P.Parser<any>[] = []
+
+  Object.keys(commands).sort(strLenSortFn).forEach( name => {
+    const cs = commands[name]
+
+    const errorFn = makeError(`command '${name}' not supported`)
+
+    const rule = P.regex(cs.regex).map(x => {
+      if (cs.isUnsupported) errorFn()
+
+      return testExpr(cs.property(x), cs.map(x))
+    })
+
+
+    const nameRule = P.regex(getNamesRegex(name, cs.abbr)).trim(P.optWhitespace)
+    const groupMap = (x: any) => B.scene.command.select({[cs.level]: x})
+
+    if (cs.isNumeric) {
+      namedCommandsList.push(
+        nameRule.then(P.seq(
+          P.regex(/>=|<=|=|!=|>|</).trim(P.optWhitespace),
+          P.regex(cs.regex).map(cs.map)
+        )).map(x => {
+          if (cs.isUnsupported) errorFn()
+          return testExpr(cs.property(x[0]), { op: x[0], val: x[1] })
+        }).map(groupMap)
+      )
+    } else {
+      namedCommandsList.push(nameRule.then(rule).map(groupMap))
+    }
+  })
+
+
+  return namedCommandsList
 }
 
 export function getKeywordRules (keywords: KeywordDict) {
